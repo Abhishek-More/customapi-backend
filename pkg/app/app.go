@@ -15,11 +15,7 @@ type App struct {
 
 func (a* App) InitializeApp() {
 	utils.LoadEnvironmentVariables()
-
 	a.Client = db.Connect()
-	a.InitializeRouter()
-
-
 	defer db.Disconnect(a.Client)
-
+	a.InitializeRouter()
 }

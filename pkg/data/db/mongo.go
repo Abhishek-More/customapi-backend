@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -20,6 +21,8 @@ func Connect() *mongo.Client {
 	ctx, _ := context.WithTimeout(context.Background(), 3 * time.Second)
 	err = client.Connect(ctx)
 	utils.CheckError(err);
+
+	fmt.Println("Connected to MongoDB!")
 
 	return client
 }

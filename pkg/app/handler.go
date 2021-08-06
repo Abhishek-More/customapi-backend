@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,11 +19,11 @@ func (a *App) InitializeRouter() {
 	//TODO: Show API Info
 	a.Router.HandleFunc("/", utils.RouteNotImplemented)
 
-	//TODO: Show Posts
 	a.Router.HandleFunc("/sample/posts", a.PostsHandler)
+	a.Router.HandleFunc("/sample/posts/{id}", a.PostHandler)
 
-	//TODO: Show Users
-	a.Router.HandleFunc("/sample/users", utils.RouteNotImplemented)
+	a.Router.HandleFunc("/sample/users", a.UsersHandler)
+	a.Router.HandleFunc("/sample/users/{id}", a.UserHandler)
 
 	http.ListenAndServe(":8000", a.Router)
 }
@@ -51,5 +52,69 @@ func (a *App) PostsHandler(w http.ResponseWriter, r *http.Request) {
 	utils.CheckError(err)
 
 	json.NewEncoder(w).Encode(posts)
+}
+
+func (a *App) PostHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	collection := a.Client.Database("sample-data").Collection("posts")
+
+	var post models.Post
+	var params = mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		utils.GetError(err, w)
+	}
+
+	filter := bson.M{"_id": id}
+	erri := collection.FindOne(context.TODO(), filter).Decode(&post)
+	utils.CheckError(erri)
+
+	json.NewEncoder(w).Encode(post)
+}
+
+func (a *App) UsersHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	
+	collection := a.Client.Database("sample-data").Collection("users")
+	
+	var users []models.User
+
+	cur, err := collection.Find(context.TODO(), bson.M{})
+	utils.CheckError(err)
+	
+	defer cur.Close(context.TODO())
+
+	for cur.Next(context.TODO()) {
+		var user models.User
+		err := cur.Decode(&user)
+		utils.CheckError(err)
+		
+		users = append(users, user)
+	}
+
+	err = cur.Err()
+	utils.CheckError(err)
+
+	json.NewEncoder(w).Encode(users)
+}
+
+func (a *App) UserHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	collection := a.Client.Database("sample-data").Collection("users")
+
+	var user models.User
+	var params = mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		utils.GetError(err, w)
+	}
+
+	filter := bson.M{"_id": id}
+	erri := collection.FindOne(context.TODO(), filter).Decode(&user)
+	utils.CheckError(erri)
+
+	json.NewEncoder(w).Encode(user)
 }
 
