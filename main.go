@@ -1,9 +1,10 @@
 package main
 
 import (
-  "fmt"
+	"github.com/Abhishek-More/customapi-backend/pkg/app"
 )
 
 func main() {
-  fmt.Println("HI")
+  project := app.App{}
+  project.InitializeApp()
 }
