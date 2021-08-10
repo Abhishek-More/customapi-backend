@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -14,6 +15,7 @@ import (
 )
 
 func (a *App) InitializeRouter() {
+        port := os.Getenv("PORT")
 	a.Router = mux.NewRouter()
 	
 	//TODO: Show API Info
@@ -25,7 +27,7 @@ func (a *App) InitializeRouter() {
 	a.Router.HandleFunc("/sample/users", a.UsersHandler)
 	a.Router.HandleFunc("/sample/users/{id}", a.UserHandler)
 
-	http.ListenAndServe(":8000", a.Router)
+        http.ListenAndServe(":"+port, a.Router)
 }
 
 func (a *App) PostsHandler(w http.ResponseWriter, r *http.Request) {
