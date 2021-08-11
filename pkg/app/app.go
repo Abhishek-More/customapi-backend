@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/Abhishek-More/customapi-backend/pkg/utils"
+	// "github.com/Abhishek-More/customapi-backend/pkg/utils"
 	"github.com/Abhishek-More/customapi-backend/pkg/data/db"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,7 +14,7 @@ type App struct {
 }
 
 func (a* App) InitializeApp() {
-	utils.LoadEnvironmentVariables()
+	// utils.LoadEnvironmentVariables()
 	a.Client = db.Connect()
 	defer db.Disconnect(a.Client)
 	a.InitializeRouter()
