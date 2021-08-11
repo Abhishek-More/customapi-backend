@@ -17,10 +17,10 @@ func Connect() *mongo.Client {
 
 	// Connect to MongoDB
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongo_uri))
-	utils.CheckError(err);
+	utils.CheckFatalError(err);
 	ctx, _ := context.WithTimeout(context.Background(), 3 * time.Second)
 	err = client.Connect(ctx)
-	utils.CheckError(err);
+	utils.CheckFatalError(err);
 
 	fmt.Println("Connected to MongoDB!")
 

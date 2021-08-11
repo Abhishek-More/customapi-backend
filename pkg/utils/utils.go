@@ -3,6 +3,7 @@ package utils
 import (
 	"net/http"
 	"log"
+	"os"
 	"fmt"
 	"encoding/json"
 )
@@ -12,17 +13,22 @@ type ErrorResponse struct {
 	ErrorMessage string `json:"message"`
 }
 
-func CheckError(err error) {
+func CheckFatalError(err error) {
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func CheckError(err error, w http.ResponseWriter, code int) {
+	if err != nil {
+		w.WriteHeader(code)
+		return
 	}
 }
 
 func RouteNotImplemented(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Not Implemented Yet!")
 }
-
-
 
 func GetError(err error, w http.ResponseWriter) {
 
@@ -35,4 +41,12 @@ func GetError(err error, w http.ResponseWriter) {
 
 	w.WriteHeader(response.StatusCode)
 	w.Write(message)
+}
+
+func GetPort() string{
+	port := os.Getenv("PORT")
+	if port == "" {
+		return "8000"
+	}
+	return port
 }

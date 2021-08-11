@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -15,43 +14,47 @@ import (
 )
 
 func (a *App) InitializeRouter() {
-        port := os.Getenv("PORT")
+    port := utils.GetPort()
 	a.Router = mux.NewRouter()
 	
 	//TODO: Show API Info
 	a.Router.HandleFunc("/", utils.RouteNotImplemented)
 
 	a.Router.HandleFunc("/sample/posts", a.PostsHandler)
+	a.Router.HandleFunc("/sample/posts/", a.PostsHandler)
 	a.Router.HandleFunc("/sample/posts/{id}", a.PostHandler)
+	a.Router.HandleFunc("/sample/posts/{id}/", a.PostHandler)
 
 	a.Router.HandleFunc("/sample/users", a.UsersHandler)
+	a.Router.HandleFunc("/sample/users/", a.UsersHandler)
 	a.Router.HandleFunc("/sample/users/{id}", a.UserHandler)
+	a.Router.HandleFunc("/sample/users/{id}/", a.UserHandler)
 
-        http.ListenAndServe(":"+port, a.Router)
+    http.ListenAndServe(":"+port, a.Router)
 }
 
 func (a *App) PostsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	collection := a.Client.Database("sample-data").Collection("posts")
 	
 	var posts []models.Post
 
 	cur, err := collection.Find(context.TODO(), bson.M{})
-	utils.CheckError(err)
+	utils.CheckFatalError(err)
 	
 	defer cur.Close(context.TODO())
 
 	for cur.Next(context.TODO()) {
 		var post models.Post
 		err := cur.Decode(&post)
-		utils.CheckError(err)
+		utils.CheckFatalError(err)
 		
 		posts = append(posts, post)
 	}
 
 	err = cur.Err()
-	utils.CheckError(err)
+	utils.CheckFatalError(err)
 
 	json.NewEncoder(w).Encode(posts)
 }
@@ -69,10 +72,12 @@ func (a *App) PostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filter := bson.M{"_id": id}
-	erri := collection.FindOne(context.TODO(), filter).Decode(&post)
-	utils.CheckError(erri)
-
-	json.NewEncoder(w).Encode(post)
+	err = collection.FindOne(context.TODO(), filter).Decode(&post)
+	utils.CheckError(err, w, 404)
+	
+	if err == nil {
+		json.NewEncoder(w).Encode(post)
+	}
 }
 
 func (a *App) UsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -83,20 +88,19 @@ func (a *App) UsersHandler(w http.ResponseWriter, r *http.Request) {
 	var users []models.User
 
 	cur, err := collection.Find(context.TODO(), bson.M{})
-	utils.CheckError(err)
+	utils.CheckFatalError(err)
 	
 	defer cur.Close(context.TODO())
 
 	for cur.Next(context.TODO()) {
 		var user models.User
 		err := cur.Decode(&user)
-		utils.CheckError(err)
-		
+		utils.CheckFatalError(err)
 		users = append(users, user)
 	}
 
 	err = cur.Err()
-	utils.CheckError(err)
+	utils.CheckFatalError(err)
 
 	json.NewEncoder(w).Encode(users)
 }
@@ -114,9 +118,11 @@ func (a *App) UserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filter := bson.M{"_id": id}
-	erri := collection.FindOne(context.TODO(), filter).Decode(&user)
-	utils.CheckError(erri)
-
-	json.NewEncoder(w).Encode(user)
+	err = collection.FindOne(context.TODO(), filter).Decode(&user)
+	utils.CheckError(err, w, 404)
+	
+	if err == nil {
+		json.NewEncoder(w).Encode(user)
+	}
 }
 
