@@ -20,15 +20,15 @@ func (a *App) InitializeRouter() {
 	//TODO: Show API Info
 	a.Router.HandleFunc("/", utils.RouteNotImplemented)
 
-	a.Router.HandleFunc("/sample/posts", a.PostsHandler)
-	a.Router.HandleFunc("/sample/posts/", a.PostsHandler)
-	a.Router.HandleFunc("/sample/posts/{id}", a.PostHandler)
-	a.Router.HandleFunc("/sample/posts/{id}/", a.PostHandler)
+	a.Router.HandleFunc("/posts", a.PostsHandler)
+	a.Router.HandleFunc("/posts/", a.PostsHandler)
+	a.Router.HandleFunc("/posts/{id}", a.PostHandler)
+	a.Router.HandleFunc("/posts/{id}/", a.PostHandler)
 
-	a.Router.HandleFunc("/sample/users", a.UsersHandler)
-	a.Router.HandleFunc("/sample/users/", a.UsersHandler)
-	a.Router.HandleFunc("/sample/users/{id}", a.UserHandler)
-	a.Router.HandleFunc("/sample/users/{id}/", a.UserHandler)
+	a.Router.HandleFunc("/users", a.UsersHandler)
+	a.Router.HandleFunc("/users/", a.UsersHandler)
+	a.Router.HandleFunc("/users/{id}", a.UserHandler)
+	a.Router.HandleFunc("/users/{id}/", a.UserHandler)
 
     http.ListenAndServe(":"+port, a.Router)
 }
