@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -14,7 +15,7 @@ import (
 
 func Connect() *mongo.Client {
 	mongo_uri := os.Getenv("URI")
-
+	log.Fatal(mongo_uri)
 	// Connect to MongoDB
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongo_uri))
 	utils.CheckFatalError(err);
